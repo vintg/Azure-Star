@@ -3,11 +3,7 @@ import React from 'react';
 const inputForm = ({handleSubmit, handleInputChange}) => (
   <div className="inputs">
     <div className="inputForm">
-        <input className="form-latitude" type="text" placeholder="latitude" name="lat"
-          onChange={e=> handleInputChange(e)}>
-        </input>
-
-        <input className="form-longitude" type="text" placeholder="longitude" name="lon"
+        <input className="form-address" type="text" placeholder="Address" name="address"
           onChange={e=> handleInputChange(e)}>
         </input>
 

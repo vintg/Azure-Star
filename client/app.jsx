@@ -10,6 +10,7 @@ export class App extends Component {
     this.state = {
       rateType: 0,
       rate: 0,
+      address: '',
       lat: 0,
       lon: 0,
       sysCap: 25,
@@ -33,21 +34,34 @@ export class App extends Component {
     this.setState({
       [e.target.name]: e.target.value
     });
+
+    if(e.target.name === 'coordinates') {
+      axios.get('/coordinates', {
+        params: {
+          address: this.state.address
+        }
+      }).then(res => {
+        this.setState({
+          lat: res.lat,
+          lon: res.lng
+        });
+      }).catch((err)=> console.log(err));
+    }
   }
 
   handleSubmit(){
     axios.get('/api',{
       params: {
-        lat: this.state.values.lat,
-        lon: this.state.values.lon,
-        system_capacity: this.state.values.syscap,
-        azimuth: this.state.values.azimuth,
-        tilt: this.state.values.tilt,
-        array_type: this.state.values.array_type,
-        module_type: this.state.values.module_type,
-        eff_losses: this.state.values.eff_losses,
+        lat: this.state.lat,
+        lon: this.state.lon,
+        system_capacity: this.state.syscap,
+        azimuth: this.state.azimuth,
+        tilt: this.state.tilt,
+        array_type: this.state.array_type,
+        module_type: this.state.module_type,
+        eff_losses: this.state.eff_losses,
       }
-    }).then( res => {
+    }).then(res => {
       this.setState({
         chartData: this.preprocess(res.data)
       });
