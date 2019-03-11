@@ -36,6 +36,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Data directory
+data/
+
 # TypeScript v1 declaration files
 typings/
 
@@ -56,6 +59,9 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# config.json variables file
+config.json
 
 # next.js build output
 .next
