@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const fs = require('fs');
-const config = require('../config');
+const config = require('./config');
 const axios = require('axios');
 
 app.use(bodyParser.json());
@@ -21,12 +21,9 @@ const asyncMiddleware = cb => (req, res, next=console.error) => {
 
 app.get('/coordinates', asyncMiddleware(async(req,res,next) => {
   const location = req.query.location || 'New York, NY';
-
   const uri = `http://open.mapquestapi.com/geocoding/v1/address?key=${config.MAPQUEST}&location=${location}`;
-
   const coords = await axios.get(uri);
-  res.json(coords);
-  next();
+  res.json(coords.results.locations.latLng);
 }));
 
 app.get('/api', asyncMiddleware(async(req,res,next) => {
@@ -42,28 +39,25 @@ app.get('/api', asyncMiddleware(async(req,res,next) => {
       } = req.query;
 
   const api_params = `&lat=${lat}&lon=${lon}&system_capacity=${system_capacity}&azimuth=${azimuth}&tilt=${tilt}&array_type=${array_type}&module_type=${module_type}&losses=${eff_losses}`;
-
   const uri = `https://developer.nrel.gov/api/pvwatts/v6.json?api_key=${config.PVWATTS}` + api_params;
-
   const getPVWatts = await axios.get(uri);
-
   const filepath = path.join(`${__dirname}/data/${api_params}.json`);
 
   if (!fs.existsSync(filepath)) {
-    if(getPVWatts.data.outputs){
+    if(getPVWatts.outputs){
       return new Promise((resolve, reject)=> {
         fs.writeFile(filepath, getPVWatts, 'UTF-8', err=> {
           if (err) reject(err);
           else resolve(getPVWatts);
         });
       })
-      .then(res.json(getPVWatts))
+      .then(res.json(getPVWatts.outputs))
       .catch(err=> console.log(err));
     }
   } else {
     fs.readFile(filepath, (err, data) => {
       if (err) res.status(400).send(err);
-      res.json(data);
+      res.json(data.outputs);
     });
   }
 }));

@@ -1,13 +1,13 @@
 import React from 'react';
 
-const inputForm = ({handleSubmit, handleInputChange}) => (
+const InputForm = ({handleSubmit, handleInputChange}) => (
   <div className="inputs">
-    <div className="inputForm">
+    <div className="input-form">
         <input className="form-address" type="text" placeholder="Address" name="address"
           onChange={e=> handleInputChange(e)}>
         </input>
 
-        <input className="form-sysCap" type="text" placeholder="System Capacity" name="sysCap"
+        <input className="form-syscap" type="text" placeholder="System Capacity" name="sysCap"
           onChange={e=> handleInputChange(e)}>
         </input>
 
@@ -38,4 +38,4 @@ const inputForm = ({handleSubmit, handleInputChange}) => (
   </div>
 );
 
-export default inputForm;
+export default InputForm;

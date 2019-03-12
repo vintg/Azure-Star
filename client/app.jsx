@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import inputForm from './components/inputForm';
+import InputForm from './components/inputForm';
 import Charts from './components/chart';
 
 export class App extends Component {
@@ -21,12 +21,11 @@ export class App extends Component {
       eff_losses: 13,
       view: 0,
       chartData: {},
-      summary: {
-        annual_solar: 0,
-        AC_energy: 0,
-        electricity_value: 0
-      }
+      annual_solar: 0,
+      AC_energy: 0,
+      electricity_value: 0
     };
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -67,19 +66,28 @@ export class App extends Component {
       });
       console.log('output:\n',res.data);
     }).catch((err)=> console.log(err));
-    }
-    changeView();
+
+    this.changeView();
   }
 
   preprocess(data) {
     this.setState({
-      summary.annual_solar: data.solrad_annual,
-      summary.AC_energy: data.ac,
-      summary.electricity_value: this.state.rate*data.ac
+      annual_solar: data.solrad_annual,
+      AC_energy: data.ac,
+      electricity_value: this.state.rate*data.ac
     });
+    const d = new Date();
+    const start = d.getMonth();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const xlabel = [];
+    for (let i = start; i<start+12;i++){
+      xlabel.push(months[i%12]);
+    }
     return {
-      labels: Object.keys(data.ac_monthly), //solrad_monthly
+      labels: xlabel,
+      //type: 'bar',
       datasets: [{
+          label: 'AC',
             backgroundColor: "rgba(66,134,244,0.3)",
             borderColor: "rgba(75,192,192,1)",
             borderCapStyle: 'butt',
@@ -95,8 +103,11 @@ export class App extends Component {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-        data: Object.values(data.ac_monthly)
-      }]
+          data: data.ac_monthly
+        }, {
+          label: 'Solar Radiation',
+          data: solrad_monthly,
+        }]
     };
   }
 
@@ -109,7 +120,7 @@ export class App extends Component {
   renderView(){
     const view = this.state.view;
     if(view === 0){
-      return <inputForm
+      return <InputForm
         handleInputChange={this.handleInputChange}
         handleSubmit={this.handleSubmit}
       />
