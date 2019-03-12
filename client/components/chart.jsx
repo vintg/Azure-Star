@@ -11,7 +11,7 @@ class Charts extends Component {
         title: {
             display: true,
             position: "top",
-            text: `${this.props.ticker} Index`,
+            text: 'Energy Forecast (1 Yr)',
             fontSize: 18,
             fontColor: "#111"
         },
@@ -39,7 +39,7 @@ class Charts extends Component {
               }
         },
         legend: {
-            display: false,
+            display: true,
             position: "bottom",
             labels: {
                 fontColor: "#333",

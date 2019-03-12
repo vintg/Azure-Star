@@ -13,7 +13,7 @@ export class App extends Component {
       address: '',
       lat: 0,
       lon: 0,
-      sysCap: 25,
+      system_capacity: 25,
       azimuth: 180,
       tilt: 25,
       array_type: 1,
@@ -23,7 +23,8 @@ export class App extends Component {
       chartData: {},
       annual_solar: 0,
       AC_energy: 0,
-      electricity_value: 0
+      electricity_value: 0,
+      mapURL: ''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -33,38 +34,35 @@ export class App extends Component {
     this.setState({
       [e.target.name]: e.target.value
     });
-
-    if(e.target.name === 'coordinates') {
-      axios.get('/coordinates', {
-        params: {
-          address: this.state.address
-        }
-      }).then(res => {
-        this.setState({
-          lat: res.lat,
-          lon: res.lng
-        });
-      }).catch((err)=> console.log(err));
-    }
   }
 
   handleSubmit(){
-    axios.get('/api',{
+    axios.get('/address', {
       params: {
-        lat: this.state.lat,
-        lon: this.state.lon,
-        system_capacity: this.state.syscap,
-        azimuth: this.state.azimuth,
-        tilt: this.state.tilt,
-        array_type: this.state.array_type,
-        module_type: this.state.module_type,
-        eff_losses: this.state.eff_losses,
-      }
+          address: this.state.address
+        }
     }).then(res => {
-      this.setState({
-        chartData: this.preprocess(res.data)
-      });
-      console.log('output:\n',res.data);
+      const coords = res.data[0].locations[1];
+      const latitude = coords.latLng.lat;
+      const longitude = coords.latLng.lng;
+      const mapURL = coords.mapUrl;
+
+      axios.get('/calculate',{
+        params: {
+          lat: latitude,
+          lon: longitude,
+          system_capacity: this.state.system_capacity,
+          azimuth: this.state.azimuth,
+          tilt: this.state.tilt,
+          array_type: this.state.array_type,
+          module_type: this.state.module_type,
+          eff_losses: this.state.eff_losses,
+        }
+      }).then(res => {
+          this.setState({
+            chartData: this.preprocess(res.data)
+          })
+      }).catch((err)=> console.log(err));
     }).catch((err)=> console.log(err));
 
     this.changeView();
@@ -85,7 +83,6 @@ export class App extends Component {
     }
     return {
       labels: xlabel,
-      //type: 'bar',
       datasets: [{
           label: 'AC',
             backgroundColor: "rgba(66,134,244,0.3)",
@@ -106,7 +103,7 @@ export class App extends Component {
           data: data.ac_monthly
         }, {
           label: 'Solar Radiation',
-          data: solrad_monthly,
+          data: data.solrad_monthly,
         }]
     };
   }

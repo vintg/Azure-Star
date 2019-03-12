@@ -19,14 +19,14 @@ const asyncMiddleware = cb => (req, res, next=console.error) => {
   Promise.resolve(cb(req, res, next)).catch(next);
 };
 
-app.get('/coordinates', asyncMiddleware(async(req,res,next) => {
+app.get('/address', asyncMiddleware(async(req,res,next) => {
   const location = req.query.location || 'New York, NY';
   const uri = `http://open.mapquestapi.com/geocoding/v1/address?key=${config.MAPQUEST}&location=${location}`;
   const coords = await axios.get(uri);
-  res.json(coords.results.locations.latLng);
+  res.json(coords.data.results);
 }));
 
-app.get('/api', asyncMiddleware(async(req,res,next) => {
+app.get('/calculate', asyncMiddleware(async(req,res,next) => {
   const {
         lat,
         lon,
@@ -40,24 +40,25 @@ app.get('/api', asyncMiddleware(async(req,res,next) => {
 
   const api_params = `&lat=${lat}&lon=${lon}&system_capacity=${system_capacity}&azimuth=${azimuth}&tilt=${tilt}&array_type=${array_type}&module_type=${module_type}&losses=${eff_losses}`;
   const uri = `https://developer.nrel.gov/api/pvwatts/v6.json?api_key=${config.PVWATTS}` + api_params;
-  const getPVWatts = await axios.get(uri);
+  const getPVWatts = await axios.get(uri); console.log(getPVWatts.data.outputs);
   const filepath = path.join(`${__dirname}/data/${api_params}.json`);
 
   if (!fs.existsSync(filepath)) {
-    if(getPVWatts.outputs){
-      return new Promise((resolve, reject)=> {
-        fs.writeFile(filepath, getPVWatts, 'UTF-8', err=> {
-          if (err) reject(err);
-          else resolve(getPVWatts);
-        });
-      })
-      .then(res.json(getPVWatts.outputs))
-      .catch(err=> console.log(err));
-    }
+    return new Promise((resolve, reject)=> {
+      fs.writeFile(filepath, getPVWatts, 'UTF-8', err=> {
+        if (err) reject(err);
+        else {
+          console.log('what writefile gets', getPVWatts.data);
+          resolve(JSON.stringify(getPVWatts.data));
+        }
+      });
+    })
+    .then(res.json(getPVWatts.data.outputs))
+    .catch(err=> console.log(err));
   } else {
     fs.readFile(filepath, (err, data) => {
       if (err) res.status(400).send(err);
-      res.json(data.outputs);
+      res.json(JSON.parse(data.outputs));
     });
   }
 }));

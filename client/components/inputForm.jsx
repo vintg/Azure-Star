@@ -7,7 +7,7 @@ const InputForm = ({handleSubmit, handleInputChange}) => (
           onChange={e=> handleInputChange(e)}>
         </input>
 
-        <input className="form-syscap" type="text" placeholder="System Capacity" name="sysCap"
+        <input className="form-syscap" type="text" placeholder="System Capacity" name="system_capacity"
           onChange={e=> handleInputChange(e)}>
         </input>
 
