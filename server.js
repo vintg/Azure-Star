@@ -37,7 +37,7 @@ app.get('/calculate', asyncMiddleware(async(req,res,next) => {
         array_type,
         module_type,
         eff_losses
-      } = req.query;
+      } = req.query; //console.log(lat,lon, 'received')
 
   const api_params = `&lat=${lat}&lon=${lon}&system_capacity=${system_capacity}&azimuth=${azimuth}&tilt=${tilt}&array_type=${array_type}&module_type=${module_type}&losses=${eff_losses}`;
   const uri = `https://developer.nrel.gov/api/pvwatts/v6.json?api_key=${config.PVWATTS}` + api_params;

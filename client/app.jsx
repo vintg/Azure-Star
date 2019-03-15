@@ -150,18 +150,23 @@ export class App extends Component {
       zoom: 12
     });
 
-    map.addControl(L.mapquest.locatorControl());
+    let locatorControl = L.mapquest.locatorControl()
+    locatorControl.on('current_position', e=>{
+      const c = e.position.coords;
+      this.setState({
+        lat: c.latitude,
+        lon: c.longitude
+      });
+    });
+    map.addControl(locatorControl);
 
     let marker = L.marker([this.state.lat, this.state.lon],
       {  draggable: true });
 
     marker.on('dragend', (e)=> {
-      const marker = e["target"];
-      const options = marker["options"];
-
       this.setState({
-        lat: marker._latlng.lat,
-        lon: marker._latlng.lng
+        lat: e.target._latlng.lat,
+        lon: e.target._latlng.lng
       });
     });
 
