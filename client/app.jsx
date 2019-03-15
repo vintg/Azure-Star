@@ -177,8 +177,11 @@ export class App extends Component {
     this.setState({
       view: (this.state.view+1)%2
     });
-    if (this.state.view === 1) {
-      this.loadMap();
+    const x = document.getElementById("map");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
     }
   }
 
@@ -187,7 +190,6 @@ export class App extends Component {
     if(view === 0){
       return (
         <div>
-        <div id="map"></div>
         <InputForm
           handleInputChange={this.handleInputChange}
           handleSubmit={this.handleSubmit}
@@ -217,6 +219,7 @@ export class App extends Component {
   render() {
     return (
       <div className="wrapper">
+        <div id = "map"></div>
         {this.renderView()}
       </div>
     );
