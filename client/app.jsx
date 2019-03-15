@@ -8,7 +8,7 @@ export class App extends Component {
   constructor() {
     super();
     this.state = {
-      rateType: 0,
+      rate_type: 0,
       rate: 0,
       address: '',
       lat: 0,
@@ -110,7 +110,7 @@ export class App extends Component {
 
   changeView(){
     this.setState({
-      view: this.state.view === 0? 1:0
+      view: (this.state.view+1)%3
     });
   }
 
@@ -122,9 +122,11 @@ export class App extends Component {
         handleSubmit={this.handleSubmit}
       />
     } else {
-      return <Charts
-        data = {this.state.chartData}
-      />
+      return (
+        <Charts data = {this.state.chartData}/>
+       // <Map data = {this.state.mapURL>
+
+      )
     }
   }
 

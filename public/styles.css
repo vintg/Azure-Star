@@ -4,8 +4,25 @@ body{
   width: 100%;
   /*background-color: #ad7c2e;*/
   /*color: #fff;*/
+    font-family: "Roboto", sans-serif
 }
 
 .wrapper{
   margin:3em;
+}
+
+.inputs{
+  height:100%;
+  margin-top:1em;
+}
+
+.input-form{
+  display:flex;
+  flex-flow: column;
+  min-width:80%;
+}
+
+.form-rate-type{
+  flex-flow: row;
+  margin:1em;
 }
