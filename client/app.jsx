@@ -12,8 +12,8 @@ export class App extends Component {
       rate_type: 0,
       rate: 0.12,
       address: '',
-      lat: 0,
-      lon: 0,
+      lat: 40.741423,
+      lon: -73.99758,
       system_capacity: 25,
       azimuth: 180,
       tilt: 25,
@@ -70,7 +70,7 @@ export class App extends Component {
     this.changeView();
   }
 
-  preprocess(data) { console.log(data);
+  preprocess(data) {
     this.setState({
       annual_solar: Number(data.solrad_annual.toFixed(3)),
       ac_energy: Number(data.ac_annual.toFixed(3)),
@@ -140,10 +140,15 @@ export class App extends Component {
   renderView(){
     const view = this.state.view;
     if(view === 0){
-      return <InputForm
+      return (
+        <div>
+        <div id="map"></div>
+        <InputForm
         handleInputChange={this.handleInputChange}
         handleSubmit={this.handleSubmit}
-      />
+        />
+        </div>
+      )
     } else {
       return (
         <div>
@@ -158,6 +163,30 @@ export class App extends Component {
         </div>
       )
     }
+  }
+
+  componentDidMount(){
+    this.loadMap();
+  }
+
+  loadMap(){
+    L.mapquest.key = "GCVgg1x7CCTVbrbmBjCt8EDJL8UvVoL5";
+
+    const map = L.mapquest.map('map',
+    {
+      enableHighAccuracy: true,
+      markerPrimaryColor: '#ff0000',
+      markerSecondaryColor: '#b7b7b7',
+      maximumAge: 0,
+      position: 'topright',
+      timeout: 3000,
+      title: 'Locator',
+      center: [this.state.lat,this.state.lon],
+      layers: L.mapquest.tileLayer('map'),
+      zoom: 12
+    });
+
+    map.addControl(L.mapquest.locatorControl());
   }
 
   render() {

@@ -8,7 +8,7 @@ const InputForm = ({handleSubmit, handleInputChange}) => (
         <input
           className="form-address"
           type="text"
-          placeholder="e.g. New York, NY or full address"
+          placeholder="e.g. New York, NY, full address, or use the Mapquest locator"
           name="address"
           onChange={e=> handleInputChange(e)}>
         </input>

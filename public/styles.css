@@ -9,7 +9,8 @@ body{
   margin:3em;
 }
 
-.inputs{
+.inputs {
+  margin-top:1em;
   height:100%;
   display:flex;
   justify-content: center;
@@ -51,4 +52,10 @@ textarea:focus, input:focus{
   text-align:right;
   margin:2em;
   width:60%;
+}
+
+#map{
+  height:320px;
+  width:60%;
+  margin:auto;
 }
