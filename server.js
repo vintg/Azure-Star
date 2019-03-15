@@ -21,7 +21,7 @@ const asyncMiddleware = cb => (req, res, next=console.error) => {
 };
 
 app.get('/address', asyncMiddleware(async(req,res,next) => {
-  const location = req.query.location || 'New York, NY';
+  const location = req.query.address || 'New York, NY'; console.log(req.query, location);
   const uri = `http://open.mapquestapi.com/geocoding/v1/address?key=${config.MAPQUEST}&location=${location}`;
   const coords = await axios.get(uri);
   res.json(coords.data.results);

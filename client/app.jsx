@@ -3,13 +3,14 @@ import axios from 'axios';
 
 import InputForm from './components/inputForm';
 import Charts from './components/chart';
+import Summary from './components/summary';
 
 export class App extends Component {
   constructor() {
     super();
     this.state = {
       rate_type: 0,
-      rate: 0,
+      rate: 0.12,
       address: '',
       lat: 0,
       lon: 0,
@@ -22,12 +23,13 @@ export class App extends Component {
       view: 0,
       chartData: {},
       annual_solar: 0,
-      AC_energy: 0,
+      ac_energy: 0,
       electricity_value: 0,
       mapURL: ''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.changeView = this.changeView.bind(this);
   }
 
   handleInputChange(e){
@@ -68,11 +70,11 @@ export class App extends Component {
     this.changeView();
   }
 
-  preprocess(data) {
+  preprocess(data) { console.log(data);
     this.setState({
-      annual_solar: data.solrad_annual,
-      AC_energy: data.ac,
-      electricity_value: this.state.rate*data.ac
+      annual_solar: Number(data.solrad_annual.toFixed(3)),
+      ac_energy: Number(data.ac_annual.toFixed(3)),
+      electricity_value: Number((this.state.rate*data.ac_annual).toFixed(3))
     });
     const d = new Date();
     const start = d.getMonth();
@@ -82,9 +84,10 @@ export class App extends Component {
       xlabel.push(months[i%12]);
     }
     return {
+      ac:{
       labels: xlabel,
       datasets: [{
-          label: 'AC',
+          label: 'AC 1-YR',
             backgroundColor: "rgba(66,134,244,0.3)",
             borderColor: "rgba(75,192,192,1)",
             borderCapStyle: 'butt',
@@ -94,23 +97,43 @@ export class App extends Component {
             pointBorderColor: "rgba(75,192,192,1)",
             pointBackgroundColor: "#fff",
             pointBorderWidth: 1,
-            pointHoverRadius: 5,
+            pointHoverRadius: 10,
             pointHoverBackgroundColor: "rgba(75,192,192,1)",
             pointHoverBorderColor: "rgba(220,220,220,1)",
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
           data: data.ac_monthly
-        }, {
-          label: 'Solar Radiation',
-          data: data.solrad_monthly,
         }]
+      },
+      solar:{
+        labels: xlabel,
+        datasets: [{
+          label: 'Solar Radiation 1-YR',
+            backgroundColor: "rgba(255,203,5,0.3)",
+            borderColor: "rgba(255, 203, 5, 1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(255, 203, 5, 1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 10,
+            pointHoverBackgroundColor: "rgba(255, 203, 5, 1)",
+            pointHoverBorderColor: "rgba(248, 148, 6, 1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+          data: data.solrad_monthly
+        }]
+      }
     };
   }
 
   changeView(){
     this.setState({
-      view: (this.state.view+1)%3
+      view: (this.state.view+1)%2
     });
   }
 
@@ -123,9 +146,16 @@ export class App extends Component {
       />
     } else {
       return (
-        <Charts data = {this.state.chartData}/>
-       // <Map data = {this.state.mapURL>
-
+        <div>
+        <Charts data={this.state.chartData.ac}/>
+        <Charts data={this.state.chartData.solar}/>
+        <Summary
+           annSol={this.state.annual_solar}
+           ac={this.state.ac_energy}
+           ev={this.state.electricity_value}
+           changeView={this.changeView}
+        />
+        </div>
       )
     }
   }

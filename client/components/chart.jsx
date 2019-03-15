@@ -11,7 +11,6 @@ class Charts extends Component {
         title: {
             display: true,
             position: "top",
-            text: 'Energy Forecast (1 Yr)',
             fontSize: 18,
             fontColor: "#111"
         },
@@ -56,8 +55,8 @@ class Charts extends Component {
         <Line
           data = {this.props.data}
           options = {this.state.chartOptions}
-          height={500}
-          width={700}
+          height={320}
+          width={640}
         />
       </div>
     );

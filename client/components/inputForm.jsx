@@ -4,90 +4,98 @@ import Button from '@material-ui/core/Button';
 const InputForm = ({handleSubmit, handleInputChange}) => (
   <div className="inputs">
     <div className="input-form">
+        <label> Address
         <input
           className="form-address"
           type="text"
-          placeholder="Address"
+          placeholder="e.g. New York, NY or full address"
           name="address"
           onChange={e=> handleInputChange(e)}>
         </input>
+        </label>
 
-        <div className="form-rate-type">
-          <input
+         <label> Rate Type
+          <select
             className="form-rate-type"
-            type="radio"
-            value="0"
             name="rate_type"
             onChange={e=> handleInputChange(e)}>
-          </input><label>Residential</label>
+            <option value="0">Residential</option>
+            <option value="1">Commercial</option>
+          </select>
+        </label>
 
-          <input
+        <label> Array Type
+        <select
             className="form-rate-type"
-            type="radio"
-            value="1"
-            name="rate_type"
+            name="array_type"
             onChange={e=> handleInputChange(e)}>
-          </input> <label>Commercial</label>
-        </div>
+            <option value="0">Fixed-Open Rack</option>
+            <option value="1">Fixed-Roof Mounted</option>
+          </select>
+        </label>
 
-        <input
-          className="form-rate"
-          type="text"
-          placeholder="Rate $/kWh"
-          name="rate"
-          onChange={e=> handleInputChange(e)}>
-        </input>
+        <label> Module Type
+        <select
+            className="form-module"
+            name="module_type"
+            onChange={e=> handleInputChange(e)}>
+            <option value="0">Standard</option>
+            <option value="1">Premium</option>
+            <option value="2">Thin Film</option>
+          </select>
+        </label>
 
+        <label> System Capacity (kW)
         <input
           className="form-syscap"
           type="text"
           name="system_capacity"
-          placeholder="System Capacity (kW) e.g. 25"
+          placeholder="25"
           onChange={e=> handleInputChange(e)}>
         </input>
+        </label>
 
+        <label> Azimuth (deg)
         <input
           className="form-azimuth"
           type="text"
-          placeholder="Azimuth (deg) e.g. 180"
+          placeholder="180"
           name="azimuth"
           onChange={e=> handleInputChange(e)}>
         </input>
+        </label>
 
+        <label> Tilt (deg)
         <input
           className="form-tilt"
           type="text"
-          placeholder="Tilt (deg) e.g. 25"
+          placeholder="25"
           name="tilt"
           onChange={e=> handleInputChange(e)}>
         </input>
+        </label>
 
-        <input
-          className="form-array"
-          type="text"
-          name="array_type"
-          placeholder = "Array Type: Enter 0 for Fixed - Open Rack, 1 for Fixed - Roof Mounted"
-          onChange={e=> handleInputChange(e)}>
-        </input>
-
-        <input
-          className="form-module"
-          type="text"
-          placeholder="Module Type: Enter 0 for Standard, 1 Premium, 2 Thin film"
-          name="module_type"
-          onChange={e=> handleInputChange(e)}>
-        </input>
-
+        <label> Efficiency Losses (%)
         <input
           className="form-eff-losses"
           type="text"
-          placeholder="Efficiency Losses (percent) e.g. 13"
+          placeholder="13"
           name="eff_losses"
           onChange={e=> handleInputChange(e)}>
         </input>
+        </label>
+
+        <label> Rate ($/kWh)
+        <input
+          className="form-rate"
+          type="text"
+          placeholder="0.12"
+          name="rate"
+          onChange={e=> handleInputChange(e)}>
+        </input>
+        </label>
 
         <Button
-          // className="form-submit"
           onClick={()=>{handleSubmit()}}>
           Calculate
         </Button>
