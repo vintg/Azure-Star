@@ -53,8 +53,8 @@ class Charts extends Component {
     return (
       <div className="chart-container">
         <Line
-          data = {this.props.data}
-          options = {this.state.chartOptions}
+          data={this.props.data}
+          options={this.state.chartOptions}
           height={320}
           width={640}
         />

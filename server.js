@@ -49,7 +49,6 @@ app.get('/calculate', asyncMiddleware(async(req,res,next) => {
     .then(json => {
       fs.writeFile(filepath, json, err => {
         if (err) throw err;
-        console.log(json);
       });
       res.json(getPVWatts.data.outputs);
     })

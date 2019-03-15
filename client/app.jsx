@@ -5,6 +5,12 @@ import InputForm from './components/inputForm';
 import Charts from './components/chart';
 import Summary from './components/summary';
 
+import config from '../config.json';
+
+L.mapquest.key = config.MAPQUEST;
+const defLat = 40.741423;
+const defLon = -73.99758;
+
 export class App extends Component {
   constructor() {
     super();
@@ -12,8 +18,8 @@ export class App extends Component {
       rate_type: 0,
       rate: 0.12,
       address: '',
-      lat: 40.741423,
-      lon: -73.99758,
+      lat: defLat,
+      lon: defLon,
       system_capacity: 25,
       azimuth: 180,
       tilt: 25,
@@ -39,15 +45,21 @@ export class App extends Component {
   }
 
   handleSubmit(){
+    let coords, latitude, longitude, mapURL;
+
     axios.get('/address', {
       params: {
           address: this.state.address
         }
     }).then(res => {
-      const coords = res.data[0].locations[1];
-      const latitude = coords.latLng.lat;
-      const longitude = coords.latLng.lng;
-      const mapURL = coords.mapUrl;
+      coords = res.data[0].locations[1];
+      latitude = coords.latLng.lat;
+      longitude = coords.latLng.lng;
+
+      if(this.state.lat !== defLat && this.state.lon !== defLon){
+        latitude = this.state.lat;
+        longitude = this.state.lon;
+      }
 
       axios.get('/calculate',{
         params: {
@@ -131,10 +143,38 @@ export class App extends Component {
     };
   }
 
+  loadMap(){
+    let map = L.mapquest.map('map', {
+      center: [this.state.lat, this.state.lon],
+      layers: L.mapquest.tileLayer('map'),
+      zoom: 12
+    });
+
+    map.addControl(L.mapquest.locatorControl());
+
+    let marker = L.marker([this.state.lat, this.state.lon],
+      {  draggable: true });
+
+    marker.on('dragend', (e)=> {
+      const marker = e["target"];
+      const options = marker["options"];
+
+      this.setState({
+        lat: marker._latlng.lat,
+        lon: marker._latlng.lng
+      });
+    });
+
+    marker.addTo(map);
+  }
+
   changeView(){
     this.setState({
       view: (this.state.view+1)%2
     });
+    if (this.state.view === 1) {
+      this.loadMap();
+    }
   }
 
   renderView(){
@@ -144,8 +184,8 @@ export class App extends Component {
         <div>
         <div id="map"></div>
         <InputForm
-        handleInputChange={this.handleInputChange}
-        handleSubmit={this.handleSubmit}
+          handleInputChange={this.handleInputChange}
+          handleSubmit={this.handleSubmit}
         />
         </div>
       )
@@ -167,26 +207,6 @@ export class App extends Component {
 
   componentDidMount(){
     this.loadMap();
-  }
-
-  loadMap(){
-    L.mapquest.key = "GCVgg1x7CCTVbrbmBjCt8EDJL8UvVoL5";
-
-    const map = L.mapquest.map('map',
-    {
-      enableHighAccuracy: true,
-      markerPrimaryColor: '#ff0000',
-      markerSecondaryColor: '#b7b7b7',
-      maximumAge: 0,
-      position: 'topright',
-      timeout: 3000,
-      title: 'Locator',
-      center: [this.state.lat,this.state.lon],
-      layers: L.mapquest.tileLayer('map'),
-      zoom: 12
-    });
-
-    map.addControl(L.mapquest.locatorControl());
   }
 
   render() {
