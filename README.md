@@ -1,11 +1,7 @@
 # Azure Star
-![azure-star](https://github.com/vintg/Azure-Star/blob/master/screenshots/Screenshot%20from%202019-03-15%2014-15-56.png)
-![azure-star](https://github.com/vintg/Azure-Star/blob/master/screenshots/Screenshot%20from%202019-03-15%2014-16-07.png)
+![input](https://github.com/vintg/Azure-Star/blob/master/screenshots/Screenshot%20from%202019-03-15%2014-15-56.png)
+![graph](https://github.com/vintg/Azure-Star/blob/master/screenshots/nyc%20chart.png)
 Draggable marker that updates location coordinates for you, as well as high accuracy auto locate
-![azure-star](https://github.com/vintg/Azure-Star/blob/master/screenshots/Screenshot%20from%202019-03-15%2014-16-32.png)
-Dynamically updated chart data in React state props for multiple locations (depends on PVWatts data availability)
-![azure-star](https://github.com/vintg/Azure-Star/blob/master/screenshots/Screenshot%20from%202019-03-15%2014-17-29.png)
-
 
 ## Requirements
 Needs API keys for PVWatts, and MapQuest
@@ -19,6 +15,5 @@ Store those in config.json in the root directory
 ### Installing Dependencies
 
 ```sh
-npm install -g webpack
 npm install
 ```
