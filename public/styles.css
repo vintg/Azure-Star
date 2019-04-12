@@ -58,4 +58,10 @@ textarea:focus, input:focus{
   height:320px;
   width:60%;
   margin:auto;
+  max-width:777px;
+}
+
+.chart-container{
+  max-width:777px;
+  margin:auto;
 }

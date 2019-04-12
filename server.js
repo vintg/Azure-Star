@@ -43,11 +43,12 @@ app.get('/calculate', asyncMiddleware(async(req,res,next) => {
   const uri = `https://developer.nrel.gov/api/pvwatts/v6.json?api_key=${config.PVWATTS}` + api_params;
   const getPVWatts = await axios.get(uri);
   const filepath = path.join(`${__dirname}/data/${api_params}.json`);
-
+  const dir = path.join(`${__dirname}/data/`);
  // if (!fs.existsSync(filepath)) {
     converter.json2csvAsync(getPVWatts.data)
     .then(json => {
       fs.writeFile(filepath, json, err => {
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
         if (err) throw err;
       });
       res.json(getPVWatts.data.outputs);
