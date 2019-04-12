@@ -7,6 +7,8 @@ import Summary from './components/summary';
 
 import config from '../config.json';
 
+let L;
+
 L.mapquest.key = config.MAPQUEST;
 const defLat = 40.741423;
 const defLon = -73.99758;
@@ -15,213 +17,249 @@ export class App extends Component {
   constructor() {
     super();
     this.state = {
-      rate_type: 0,
+      // rate_type: 0,
       rate: 0.12,
       address: '',
       lat: defLat,
       lon: defLon,
-      system_capacity: 25,
+      systemCapacity: 25,
       azimuth: 180,
       tilt: 25,
-      array_type: 1,
-      module_type: 1,
-      eff_losses: 13,
+      arrayType: 1,
+      moduleType: 1,
+      effLosses: 13,
       view: 0,
       chartData: {},
-      annual_solar: 0,
-      ac_energy: 0,
-      electricity_value: 0,
-      mapURL: ''
+      annualSolar: 0,
+      acEnergy: 0,
+      electricityValue: 0,
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.changeView = this.changeView.bind(this);
   }
 
-  handleInputChange(e){
+  componentDidMount() {
+    this.loadMap();
+  }
+
+  handleInputChange(e) {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   }
 
-  handleSubmit(){
-    let coords, latitude, longitude, mapURL;
+  handleSubmit() {
+    let coords; let latitude; let longitude;
 
-    axios.get('/address', {
-      params: {
-          address: this.state.address
-        }
-    }).then(res => {
-      coords = res.data[0].locations[1];
-      latitude = coords.latLng.lat;
-      longitude = coords.latLng.lng;
+    const {
+      lat, lon, systemCapacity, azimuth, tilt, arrayType, moduleType, effLosses, address,
+    } = this.state;
 
-      if(this.state.lat !== defLat && this.state.lon !== defLon){
-        latitude = this.state.lat;
-        longitude = this.state.lon;
-      }
-
-      axios.get('/calculate',{
+    axios
+      .get('/address', {
         params: {
-          lat: latitude,
-          lon: longitude,
-          system_capacity: this.state.system_capacity,
-          azimuth: this.state.azimuth,
-          tilt: this.state.tilt,
-          array_type: this.state.array_type,
-          module_type: this.state.module_type,
-          eff_losses: this.state.eff_losses,
+          address: { address },
+        },
+      })
+      .then((res) => {
+        coords = res.data[0].locations[1];
+        latitude = coords.latLng.lat;
+        longitude = coords.latLng.lng;
+
+        if ({ lat } !== defLat && { lon } !== defLon) {
+          latitude = { lat };
+          longitude = { lon };
         }
-      }).then(res => {
-          this.setState({
-            chartData: this.preprocess(res.data)
+
+        axios
+          .get('/calculate', {
+            params: {
+              lat: latitude,
+              lon: longitude,
+              systemCapacity: { systemCapacity },
+              azimuth: { azimuth },
+              tilt: { tilt },
+              arrayType: { arrayType },
+              moduleType: { moduleType },
+              effLosses: { effLosses },
+            },
           })
-      }).catch((err)=> console.log(err));
-    }).catch((err)=> console.log(err));
+          .then((res2) => {
+            this.setState({
+              chartData: this.preprocess(res2.data),
+            });
+          })
+          .catch(err => console.error(err));
+      })
+      .catch(err => console.error(err));
 
     this.changeView();
   }
 
   preprocess(data) {
+    const { rate } = this.state;
+
     this.setState({
-      annual_solar: Number(data.solrad_annual.toFixed(3)),
-      ac_energy: Number(data.ac_annual.toFixed(3)),
-      electricity_value: Number((this.state.rate*data.ac_annual).toFixed(3))
+      annualSolar: Number(data.solrad_annual.toFixed(3)),
+      acEnergy: Number(data.ac_annual.toFixed(3)),
+      electricityValue: Number(({ rate } * data.ac_annual).toFixed(3)),
     });
     const d = new Date();
     const start = d.getMonth();
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     const xlabel = [];
-    for (let i = start; i<start+12;i++){
-      xlabel.push(months[i%12]);
+    for (let i = start; i < start + 12; i + 1) {
+      xlabel.push(months[i % 12]);
     }
     return {
-      ac:{
-      labels: xlabel,
-      datasets: [{
-          label: 'AC 1-YR',
-            backgroundColor: "rgba(66,134,244,0.3)",
-            borderColor: "rgba(75,192,192,1)",
-            borderCapStyle: 'butt',
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: 'miter',
-            pointBorderColor: "rgba(75,192,192,1)",
-            pointBackgroundColor: "#fff",
-            pointBorderWidth: 1,
-            pointHoverRadius: 10,
-            pointHoverBackgroundColor: "rgba(75,192,192,1)",
-            pointHoverBorderColor: "rgba(220,220,220,1)",
-            pointHoverBorderWidth: 2,
-            pointRadius: 1,
-            pointHitRadius: 10,
-          data: data.ac_monthly
-        }]
-      },
-      solar:{
+      ac: {
         labels: xlabel,
-        datasets: [{
-          label: 'Solar Radiation 1-YR',
-            backgroundColor: "rgba(255,203,5,0.3)",
-            borderColor: "rgba(255, 203, 5, 1)",
+        datasets: [
+          {
+            label: 'AC 1-YR',
+            backgroundColor: 'rgba(66,134,244,0.3)',
+            borderColor: 'rgba(75,192,192,1)',
             borderCapStyle: 'butt',
             borderDash: [],
             borderDashOffset: 0.0,
             borderJoinStyle: 'miter',
-            pointBorderColor: "rgba(255, 203, 5, 1)",
-            pointBackgroundColor: "#fff",
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
             pointBorderWidth: 1,
             pointHoverRadius: 10,
-            pointHoverBackgroundColor: "rgba(255, 203, 5, 1)",
-            pointHoverBorderColor: "rgba(248, 148, 6, 1)",
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-          data: data.solrad_monthly
-        }]
-      }
+            data: data.ac_monthly,
+          },
+        ],
+      },
+      solar: {
+        labels: xlabel,
+        datasets: [
+          {
+            label: 'Solar Radiation 1-YR',
+            backgroundColor: 'rgba(255,203,5,0.3)',
+            borderColor: 'rgba(255, 203, 5, 1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(255, 203, 5, 1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 10,
+            pointHoverBackgroundColor: 'rgba(255, 203, 5, 1)',
+            pointHoverBorderColor: 'rgba(248, 148, 6, 1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: data.solrad_monthly,
+          },
+        ],
+      },
     };
   }
 
-  loadMap(){
-    let map = L.mapquest.map('map', {
-      center: [this.state.lat, this.state.lon],
+  loadMap() {
+    const { lat, lon } = this.state;
+
+    const map = L.mapquest.map('map', {
+      center: [{ lat }, { lon }],
       layers: L.mapquest.tileLayer('map'),
-      zoom: 12
+      zoom: 12,
     });
 
-    let locatorControl = L.mapquest.locatorControl()
-    locatorControl.on('current_position', e=>{
+    const locatorControl = L.mapquest.locatorControl();
+    locatorControl.on('current_position', (e) => {
       const c = e.position.coords;
       this.setState({
         lat: c.latitude,
-        lon: c.longitude
+        lon: c.longitude,
       });
     });
     map.addControl(locatorControl);
 
-    let marker = L.marker([this.state.lat, this.state.lon],
-      {  draggable: true });
+    const marker = L.marker([{ lat }, { lon }], {
+      draggable: true,
+    });
 
-    marker.on('dragend', (e)=> {
+    marker.on('dragend', (e) => {
       this.setState({
         lat: e.target._latlng.lat,
-        lon: e.target._latlng.lng
+        lon: e.target._latlng.lng,
       });
     });
 
     marker.addTo(map);
   }
 
-  changeView(){
+  changeView() {
+    const { view } = this.state;
+
     this.setState({
-      view: (this.state.view+1)%2
+      view: ({ view } + 1) % 2,
     });
-    const x = document.getElementById("map");
-    if (x.style.display === "none") {
-      x.style.display = "block";
+    const x = document.getElementById('map');
+    if (x.style.display === 'none') {
+      x.style.display = 'block';
     } else {
-      x.style.display = "none";
+      x.style.display = 'none';
     }
   }
 
-  renderView(){
-    const view = this.state.view;
-    if(view === 0){
+  renderView() {
+    const {
+      view, chartData, annualSolar, acEnergy, electricityValue,
+    } = this.state;
+    if (view === 0) {
       return (
         <div>
-        <InputForm
-          handleInputChange={this.handleInputChange}
-          handleSubmit={this.handleSubmit}
-        />
+          <InputForm
+            handleInputChange={this.handleInputChange}
+            handleSubmit={this.handleSubmit}
+          />
         </div>
-      )
-    } else {
-      return (
-        <div>
-        <Charts data={this.state.chartData.ac}/>
-        <Charts data={this.state.chartData.solar}/>
+      );
+    }
+    return (
+      <div>
+        <Charts data={chartData.ac} />
+        <Charts data={chartData.solar} />
         <Summary
-           annSol={this.state.annual_solar}
-           ac={this.state.ac_energy}
-           ev={this.state.electricity_value}
-           changeView={this.changeView}
+          annSol={annualSolar}
+          ac={acEnergy}
+          ev={electricityValue}
+          changeView={this.changeView}
         />
-        </div>
-      )
-    }
-  }
-
-  componentDidMount(){
-    this.loadMap();
+      </div>
+    );
   }
 
   render() {
     return (
       <div className="wrapper">
-        <div id = "map"></div>
+        <div id="map" />
         {this.renderView()}
       </div>
     );
   }
-};
+}
+
+export default App;
